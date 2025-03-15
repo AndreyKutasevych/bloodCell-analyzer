@@ -13,8 +13,12 @@
                   <ImageView fx:id="imageView" fitHeight="446.0" fitWidth="549.0" layoutX="14.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true" />
                   <Button fx:id="fileChooserButton" layoutX="29.0" layoutY="25.0" mnemonicParsing="false" onAction="#fileChoosing" text="Choose image" />
                   <ImageView fx:id="imageViewRGB" fitHeight="446.0" fitWidth="549.0" layoutX="600.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true" />
-                  <Label layoutX="129.0" layoutY="5.0" text="Red channell on the second one" />
-                  <Slider fx:id="saturationSlider" layoutX="154.0" layoutY="30.0" />
+                  <Label layoutX="213.0" layoutY="5.0" text="Hue" />
+                  <Slider fx:id="hueSlider" layoutX="154.0" layoutY="30.0" />
+                  <Slider fx:id="saturationSlider" layoutX="308.0" layoutY="31.0" />
+                  <Label layoutX="350.0" layoutY="5.0" text="Saturation" />
+                  <Slider fx:id="brightnessSlider" layoutX="460.0" layoutY="30.0" />
+                  <Label layoutX="506.0" layoutY="5.0" text="Brigtness" />
                </children></AnchorPane>
       </content>
     </Tab>

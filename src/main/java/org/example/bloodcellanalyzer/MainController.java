@@ -20,6 +20,10 @@ public class MainController {
     private ImageView imageViewRGB;
     @FXML
     private Slider saturationSlider;
+    @FXML
+    private Slider hueSlider;
+    @FXML
+    private Slider brightnessSlider;
     private PixelWriter pixelWriter;
     private PixelReader pixelReader;
     private PixelWriter pixelWriterRGB;
@@ -31,11 +35,18 @@ public class MainController {
     private void initialize() {
         saturationSlider.setMin(0);
         saturationSlider.setMax(1);
-        saturationSlider.setShowTickLabels(true);
-        saturationSlider.setShowTickMarks(true);
-        saturationSlider.setMajorTickUnit(0.1);
+        hueSlider.setMin(0);
+        hueSlider.setMax(1);
+        brightnessSlider.setMin(0);
+        brightnessSlider.setMax(1);
         saturationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            displayRGBImage(saturationSlider.getValue());
+            hsbDisplayOfRGBImage(saturationSlider.getValue(),hueSlider.getValue(),brightnessSlider.getValue());
+        });
+        hueSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            hsbDisplayOfRGBImage(saturationSlider.getValue(),hueSlider.getValue(),brightnessSlider.getValue());
+        });
+        brightnessSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            hsbDisplayOfRGBImage(saturationSlider.getValue(),hueSlider.getValue(),brightnessSlider.getValue());
         });
     }
 
@@ -80,16 +91,16 @@ public class MainController {
         }
     }
     @FXML
-    private void displayRGBImage(double value) {
+    private void hsbDisplayOfRGBImage(double saturation, double hue, double brightness) {
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 Color color = pixelReaderRGB.getColor(x, y);
 
                 // Adjust saturation
-                Color adjustedColor = Color.rgb(
-                        (int)(color.getRed()*value*255),
-                        (int)color.getGreen()*255,
-                        (int)color.getBlue()*255
+                Color adjustedColor = Color.hsb(
+                        color.getHue()*hue,
+                        color.getSaturation()*saturation,
+                        color.getBrightness()*brightness
                 );
 
                 pixelWriterRGB.setColor(x, y, adjustedColor);
