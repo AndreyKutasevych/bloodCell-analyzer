@@ -8,16 +8,14 @@
   <tabs>
     <Tab text="Original">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="223.0" prefWidth="600.0">
                <children>
+                  <ImageView fx:id="imageView" fitHeight="446.0" fitWidth="549.0" layoutX="14.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true" />
                   <Button fx:id="fileChooserButton" layoutX="29.0" layoutY="25.0" mnemonicParsing="false" onAction="#fileChoosing" text="Choose image" />
-                  <ImageView fx:id="imageView" fitHeight="700" fitWidth="1300" layoutX="75.0" layoutY="93.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="imageViewRGB" fitHeight="446.0" fitWidth="549.0" layoutX="600.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label layoutX="129.0" layoutY="5.0" text="Red channell on the second one" />
+                  <Slider fx:id="saturationSlider" layoutX="154.0" layoutY="30.0" />
                </children></AnchorPane>
-      </content>
-    </Tab>
-    <Tab text="Color switcher">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
       </content>
     </Tab>
   </tabs>
