@@ -31,6 +31,7 @@ public class MainController {
     private Image image;
     private WritableImage writableImage;
     private WritableImage writableImageRGB;
+    private int[] pixelArray;
     @FXML
     private void initialize() {
         saturationSlider.setMin(0);
@@ -107,5 +108,11 @@ public class MainController {
             }
         }
         imageViewRGB.setImage(writableImageRGB);
+    }
+    public void pixelArrayChoosing(){
+        pixelArray=new int[(int)image.getWidth()*(int)image.getHeight()];
+        for (int i = 1; i < pixelArray.length; i++) {
+            pixelArray[i]=i;
+        }
     }
 }
