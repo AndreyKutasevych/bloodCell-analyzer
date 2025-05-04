@@ -3,23 +3,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="422.0" prefWidth="662.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.bloodcellanalyzer.MainController">
   <tabs>
     <Tab text="Original">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="223.0" prefWidth="600.0">
+        <AnchorPane fx:id="mainPane" minHeight="0.0" minWidth="0.0" prefHeight="223.0" prefWidth="600.0">
                <children>
                   <ImageView fx:id="imageView" fitHeight="446.0" fitWidth="549.0" layoutX="14.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true" />
                   <Button fx:id="fileChooserButton" layoutX="29.0" layoutY="25.0" mnemonicParsing="false" onAction="#fileChoosing" text="Choose image" />
                   <ImageView fx:id="imageViewRGB" fitHeight="446.0" fitWidth="549.0" layoutX="600.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true" />
-                  <Label layoutX="213.0" layoutY="5.0" text="Hue" />
-                  <Slider fx:id="hueSlider" layoutX="154.0" layoutY="30.0" />
-                  <Slider fx:id="saturationSlider" layoutX="308.0" layoutY="31.0" />
-                  <Label layoutX="350.0" layoutY="5.0" text="Saturation" />
-                  <Slider fx:id="brightnessSlider" layoutX="460.0" layoutY="30.0" />
-                  <Label layoutX="506.0" layoutY="5.0" text="Brigtness" />
-                  <Button layoutX="616.0" layoutY="24.0" mnemonicParsing="false" onAction="#displayBothImages" text="Reset" />
+                  <Label layoutX="189.0" layoutY="5.0" text="Red filter" />
+                  <Slider fx:id="redFilter" layoutX="143.0" layoutY="30.0" showTickLabels="true" showTickMarks="true" />
+                  <Slider fx:id="blueFilter" layoutX="306.0" layoutY="30.0" showTickLabels="true" showTickMarks="true" />
+                  <Label layoutX="350.0" layoutY="5.0" text="Blue Filter" />
+                  <Label fx:id="cellLabel" layoutX="29.0" layoutY="600.0" text="Amount of total cells:">
+                     <font>
+                        <Font size="16.0" />
+                     </font></Label>
                </children></AnchorPane>
       </content>
     </Tab>

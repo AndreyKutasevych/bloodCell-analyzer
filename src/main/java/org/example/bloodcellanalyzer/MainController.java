@@ -3,10 +3,16 @@ package org.example.bloodcellanalyzer;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainController {
     @FXML
@@ -15,39 +21,41 @@ public class MainController {
     @FXML
     private Button fileChooserButton;
     @FXML
+    private AnchorPane mainPane;
+    @FXML
     private ImageView imageView;
     @FXML
     private ImageView imageViewRGB;
     @FXML
-    private Slider saturationSlider;
+    private Slider redFilter;
     @FXML
-    private Slider hueSlider;
+    private Slider blueFilter;
     @FXML
-    private Slider brightnessSlider;
+    private Label cellLabel;
     private PixelWriter pixelWriter;
     private PixelReader pixelReader;
     private PixelWriter pixelWriterRGB;
-    private PixelReader pixelReaderRGB;
     private Image image;
     private WritableImage writableImage;
     private WritableImage writableImageRGB;
     private int[] pixelArray;
+    private double redFilterValue;
+    private double blueFilterValue;
+
     @FXML
     private void initialize() {
-        saturationSlider.setMin(0);
-        saturationSlider.setMax(1);
-        hueSlider.setMin(0);
-        hueSlider.setMax(1);
-        brightnessSlider.setMin(0);
-        brightnessSlider.setMax(1);
-        saturationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            hsbDisplayOfRGBImage(saturationSlider.getValue(),hueSlider.getValue(),brightnessSlider.getValue());
+        redFilter.setMin(0);
+        redFilter.setMax(1);
+        blueFilter.setMin(0);
+        blueFilter.setMax(1);
+
+        redFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
+            redFilterValue=redFilter.getValue();
+            displayBothImages();
         });
-        hueSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            hsbDisplayOfRGBImage(saturationSlider.getValue(),hueSlider.getValue(),brightnessSlider.getValue());
-        });
-        brightnessSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            hsbDisplayOfRGBImage(saturationSlider.getValue(),hueSlider.getValue(),brightnessSlider.getValue());
+        blueFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
+            blueFilterValue=blueFilter.getValue();
+            displayBothImages();
         });
     }
 
@@ -62,7 +70,6 @@ public class MainController {
         if (file != null) {
             image = new Image(file.toURI().toString(),imageView.getFitWidth(),imageView.getFitHeight(),false,true);
             pixelReader = image.getPixelReader();
-            pixelReaderRGB = image.getPixelReader();
             writableImage = new WritableImage((int) image.getWidth(), (int) image.getHeight());
             writableImageRGB = new WritableImage((int) image.getWidth(), (int) image.getHeight());
             pixelWriter = writableImage.getPixelWriter();
@@ -72,6 +79,7 @@ public class MainController {
             displayBothImages();
         }
     }
+
     @FXML
     private void displayBothImages() {
         for (int x = 0; x < image.getWidth(); x++) {
@@ -79,10 +87,9 @@ public class MainController {
                 pixelWriter.setColor(x, y, pixelReader.getColor(x, y));
                 double red = pixelReader.getColor(x,y).getRed();
                 double blue = pixelReader.getColor(x,y).getBlue();
-                double white = (red+blue)/2;
-                if(red<=0.85 && red>=0.3 && red>blue){
+                if(red<=redFilterValue  && red>blue){
                     pixelWriterRGB.setColor(x, y, Color.RED);
-                } else if (blue<=0.75 && blue >=0.3 && blue>red) {
+                } else if (blue<=blueFilterValue  && blue>red) {
                     pixelWriterRGB.setColor(x, y, Color.PURPLE);
                 }
                 else{
@@ -90,29 +97,114 @@ public class MainController {
                 }
             }
         }
+        pixelArrayCreation();
+        union();
     }
+
+    public void pixelArrayCreation(){
+        pixelArray=new int[(int)writableImageRGB.getWidth()*(int)writableImageRGB.getHeight()];
+        for (int i = 0; i < pixelArray.length; i++) {
+            pixelArray[i]=-1;
+        }
+    }
+
     @FXML
-    private void hsbDisplayOfRGBImage(double saturation, double hue, double brightness) {
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                Color color = pixelReaderRGB.getColor(x, y);
-
-                // Adjust saturation
-                Color adjustedColor = Color.hsb(
-                        color.getHue()*hue,
-                        color.getSaturation()*saturation,
-                        color.getBrightness()*brightness
-                );
-
-                pixelWriterRGB.setColor(x, y, adjustedColor);
+    public void union() {
+        pixelArrayCreation();
+        int position = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                Color current = writableImageRGB.getPixelReader().getColor(x, y);
+                if (current.equals(Color.RED) || current.equals(Color.PURPLE)) {
+                    if (x + 1 < image.getWidth()) {
+                        Color right = writableImageRGB.getPixelReader().getColor(x + 1, y);
+                        if (current.equals(right)) {
+                            DisjointSet.union(pixelArray, position, position + 1);
+                        }
+                    }
+                    if (y + 1 < image.getHeight()) {
+                        Color down = writableImageRGB.getPixelReader().getColor(x, y + 1);
+                        if (current.equals(down)) {
+                            DisjointSet.union(pixelArray, position, position + (int) image.getWidth());
+                        }
+                    }
+                } else {
+                    pixelArray[position] = -2; // White background
+                }
+                position++;
             }
         }
-        imageViewRGB.setImage(writableImageRGB);
+        rectangleDraw();
     }
-    public void pixelArrayChoosing(){
-        pixelArray=new int[(int)image.getWidth()*(int)image.getHeight()];
-        for (int i = 1; i < pixelArray.length; i++) {
-            pixelArray[i]=i;
+    @FXML
+    private void rectangleDraw(){
+        rectangleClear();
+        List<Integer> rootList = new ArrayList<>();
+        int minCellSize = 100;
+
+        for (int i = 0; i < pixelArray.length; i++) {
+            if (pixelArray[i] < -minCellSize) {
+                rootList.add(i);
+            }
         }
+
+        int cellIndex = 1;
+        for (int root : rootList) {
+            int[] outerBounds = getOuterBoundOfCell(root);
+
+            int minX = outerBounds[0];
+            int maxX = outerBounds[1];
+            int minY = outerBounds[2];
+            int maxY = outerBounds[3];
+
+            // Create rectangle
+            Rectangle rect = new Rectangle(
+                    minX,
+                    minY,
+                    maxX - minX,
+                    maxY - minY
+            );
+            rect.setStroke(Color.BLACK);
+            rect.setFill(Color.TRANSPARENT);
+
+            // Create cell number label (Text)
+            Text label = new Text(String.valueOf(cellIndex));
+            label.setFill(Color.BLACK);
+            label.setX(minX + 5);              // small offset inside rectangle
+            label.setY(minY + 15);             // small offset from top
+
+            // Add both to the pane
+            mainPane.getChildren().addAll(rect, label);
+
+            cellIndex++;
+        }
+        cellLabel.setText("Total amount of cells: "+cellIndex);
+
     }
+    private void rectangleClear(){
+        mainPane.getChildren().removeIf(node -> node instanceof Rectangle);
+        mainPane.getChildren().removeIf(node -> node instanceof Text);
+    }
+
+    private int[] getOuterBoundOfCell(int root){
+        int minX = (int) writableImageRGB.getWidth();
+        int maxX = 0;
+        int minY = (int) writableImageRGB.getHeight();
+        int maxY = 0;
+
+        for (int i = 0; i < pixelArray.length; i++) {
+            if (DisjointSet.find(pixelArray, i) == root) {
+                int x = i % (int) writableImageRGB.getWidth();
+                int y = i / (int) writableImageRGB.getWidth();
+
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        return new int[] { minX+14, maxX+14, minY+64, maxY+64 };
+    }
+
 }
