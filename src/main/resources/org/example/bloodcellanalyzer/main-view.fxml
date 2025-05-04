@@ -22,6 +22,8 @@
                      <font>
                         <Font size="16.0" />
                      </font></Label>
+                  <Label layoutX="527.0" layoutY="5.0" text="Minimal cell size" />
+                  <Slider fx:id="cellSizeSlider" layoutX="501.0" layoutY="30.0" showTickLabels="true" showTickMarks="true" />
                </children></AnchorPane>
       </content>
     </Tab>

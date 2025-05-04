@@ -19,7 +19,7 @@ public class MainController {
     private Label welcomeText;
 
     @FXML
-    private Button fileChooserButton;
+    private Slider cellSizeSlider;
     @FXML
     private AnchorPane mainPane;
     @FXML
@@ -41,6 +41,7 @@ public class MainController {
     private int[] pixelArray;
     private double redFilterValue;
     private double blueFilterValue;
+    private int minimalCellSize=20;
 
     @FXML
     private void initialize() {
@@ -48,6 +49,8 @@ public class MainController {
         redFilter.setMax(1);
         blueFilter.setMin(0);
         blueFilter.setMax(1);
+        cellSizeSlider.setMin(20);
+        cellSizeSlider.setMax(500);
 
         redFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
             redFilterValue=redFilter.getValue();
@@ -55,6 +58,10 @@ public class MainController {
         });
         blueFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
             blueFilterValue=blueFilter.getValue();
+            displayBothImages();
+        });
+        cellSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            minimalCellSize=(int)cellSizeSlider.getValue();
             displayBothImages();
         });
     }
@@ -82,6 +89,7 @@ public class MainController {
 
     @FXML
     private void displayBothImages() {
+        rectangleClear();
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 pixelWriter.setColor(x, y, pixelReader.getColor(x, y));
@@ -129,21 +137,21 @@ public class MainController {
                         }
                     }
                 } else {
-                    pixelArray[position] = -2; // White background
+                    pixelArray[position] = -2;
                 }
                 position++;
             }
         }
         rectangleDraw();
     }
+
     @FXML
-    private void rectangleDraw(){
+    private void rectangleDraw() {
         rectangleClear();
         List<Integer> rootList = new ArrayList<>();
-        int minCellSize = 100;
 
         for (int i = 0; i < pixelArray.length; i++) {
-            if (pixelArray[i] < -minCellSize) {
+            if (pixelArray[i] < -minimalCellSize) {
                 rootList.add(i);
             }
         }
@@ -157,30 +165,35 @@ public class MainController {
             int minY = outerBounds[2];
             int maxY = outerBounds[3];
 
-            // Create rectangle
+            // Determine color type from a representative pixel (e.g., the root pixel)
+            int x = root % (int) writableImageRGB.getWidth();
+            int y = root / (int) writableImageRGB.getWidth();
+            Color rootColor = writableImageRGB.getPixelReader().getColor(x, y);
+
+            Color cellColor = rootColor.equals(Color.RED) ? Color.GREEN : Color.BLUE;
+
             Rectangle rect = new Rectangle(
                     minX,
                     minY,
                     maxX - minX,
                     maxY - minY
             );
-            rect.setStroke(Color.BLACK);
+            rect.setStroke(cellColor);
             rect.setFill(Color.TRANSPARENT);
 
-            // Create cell number label (Text)
             Text label = new Text(String.valueOf(cellIndex));
-            label.setFill(Color.BLACK);
-            label.setX(minX + 5);              // small offset inside rectangle
-            label.setY(minY + 15);             // small offset from top
+            label.setFill(cellColor);
+            label.setX(minX + 5);
+            label.setY(minY + 15);
 
-            // Add both to the pane
             mainPane.getChildren().addAll(rect, label);
-
             cellIndex++;
         }
-        cellLabel.setText("Total amount of cells: "+cellIndex);
 
+        cellLabel.setText("Total amount of cells: " + (cellIndex - 1));
     }
+
+
     private void rectangleClear(){
         mainPane.getChildren().removeIf(node -> node instanceof Rectangle);
         mainPane.getChildren().removeIf(node -> node instanceof Text);
