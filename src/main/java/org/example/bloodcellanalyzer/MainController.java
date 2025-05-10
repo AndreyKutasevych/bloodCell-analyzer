@@ -15,39 +15,30 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainController {
-
-    @FXML
-    private Slider cellSizeSlider;
     @FXML
     private AnchorPane mainPane;
+
     @FXML
-    private ImageView imageView;
-    @FXML
-    private ImageView imageViewRGB;
-    @FXML
-    private Slider redFilter;
-    @FXML
-    private Slider blueFilter;
-    @FXML
-    private Label cellLabel;
-    private PixelWriter pixelWriter;
-    private PixelReader pixelReader;
-    private PixelWriter pixelWriterRGB;
+    private ImageView imageView, imageViewRGB;
     private Image image;
     private WritableImage writableImageRGB;
-    private int[] pixelArray;
-    private double redFilterValue;
-    private double blueFilterValue;
+    private PixelWriter pixelWriter,pixelWriterRGB;
+    private PixelReader pixelReader;
+
+    @FXML
+    private Slider redFilter, blueFilter,cellSizeSlider;
+    private double redFilterValue, blueFilterValue;
+    @FXML
+    private Label cellLabel;
     private int minimalCellSize=20;
+
+    private int[] pixelArray;
 
     @FXML
     private void initialize() {
-        redFilter.setMin(0);
-        redFilter.setMax(1);
-        blueFilter.setMin(0);
-        blueFilter.setMax(1);
-        cellSizeSlider.setMin(20);
-        cellSizeSlider.setMax(500);
+        redFilter.setMin(0); redFilter.setMax(1);
+        blueFilter.setMin(0); blueFilter.setMax(1);
+        cellSizeSlider.setMin(20); cellSizeSlider.setMax(500);
 
         //adding listeners to the sliders
         redFilter.valueProperty().addListener((_, _, _) -> {
@@ -68,9 +59,8 @@ public class MainController {
     private void fileChoosing() { // file selection and
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
-        );
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
+
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             image = new Image(file.toURI().toString(),imageView.getFitWidth(),imageView.getFitHeight(),false,true);
